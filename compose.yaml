@@ -1,0 +1,22 @@
+# Run with: nerdctl compose up -d
+services:
+  db:
+    image: postgres:16
+    container_name: meetmind-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: meetmind
+      POSTGRES_PASSWORD: meetmind
+      POSTGRES_DB: meetmind
+    ports:
+      - "5432:5432"
+    volumes:
+      - meetmind_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meetmind -d meetmind"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  meetmind_pgdata:
