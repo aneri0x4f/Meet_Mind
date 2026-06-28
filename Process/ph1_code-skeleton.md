@@ -1,6 +1,8 @@
 > The following is the initial instructions given to the claude code. "Why does Phase 1 look shallow?" — it's supposed to. Phase 1 is structure only — no real AI logic, no real UI screens. Think of it like a building's skeleton before walls go up. The reason we do this first is so Claude Code has a consistent foundation to build Phase 2 on. If you skip Phase 1 and jump to features, the structure gets inconsistent and Claude Code starts making conflicting choices. Phase 1 = one big prompt. Phase 2+ = one feature at a time, very specific.
 
 
+
+
 Create a full-stack project called MeetMind following this exact structure:
 
 Backend: Python 3.12 + FastAPI + SQLModel + Alembic + PostgreSQL

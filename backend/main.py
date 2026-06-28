@@ -44,3 +44,12 @@ app.include_router(meetings.router)
 app.include_router(action_items.router)
 app.include_router(nuggets.router)
 app.include_router(people.router)
+
+
+if __name__ == "__main__":
+    # Lets you run the dev server with `python main.py` (needs the venv active so
+    # uvicorn/fastapi are importable). Equivalent to:
+    #   uvicorn main:app --reload --port 8000
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

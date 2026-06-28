@@ -84,3 +84,38 @@ cd frontend && npm run dev
 - ❌ Don't create migrations by hand-editing the DB; use Alembic.
 - ❌ Don't commit `.env` (only `.env.example` is tracked).
 - ❌ Don't mirror TanStack Query data into Zustand.
+
+## Local environment notes (for Claude — discovered 2026-06-28)
+
+These are machine/setup specifics that aren't obvious from the code:
+
+- **`uv` is not installed via Homebrew.** It was installed with `pip3 install --user uv`
+  and lives at `~/Library/Python/3.14/bin/uv`, which is **NOT on PATH** by default.
+  Either call it by full path or add `$HOME/Library/Python/3.14/bin` to PATH. Until
+  then, the `make` targets (which call bare `uv`) won't work.
+- **Containers use `nerdctl` (Rancher Desktop, containerd backend), never `docker`.**
+  The Docker daemon socket is intentionally not running. Use `nerdctl compose ...`.
+- **npm registry / corporate proxy:** the public `registry.npmjs.org` is blocked
+  (`403 Forbidden`). The working registry is `https://npm.dev.paypalinc.com/` (already
+  in system `/usr/local/etc/npmrc`). A personal `~/.npmrc` was overriding it back to
+  the public registry — fixed with `npm config set registry https://npm.dev.paypalinc.com/`.
+  See the README "Behind a corporate proxy?" note. npm config precedence is
+  project → user (`~/.npmrc`) → system, and the user file wins.
+- **Vite binds to IPv6 `localhost` only.** Use `http://localhost:5173`, not
+  `http://127.0.0.1:5173` (the latter refuses). `npm run dev -- --host` exposes IPv4.
+
+## Status (as of 2026-06-28)
+
+The repo is a complete vertical slice, NOT just a Phase-1 skeleton — backend agents,
+pipeline, routes, models, and the full frontend are all implemented.
+
+- ✅ Backend deps synced (`uv sync`); tests pass (`uv run pytest`, 7/7).
+- ✅ Initial Alembic migration authored at `backend/alembic/versions/0001_initial_schema.py`
+  and applied; verified faithful via `alembic revision --autogenerate` (empty diff).
+  This was the one genuinely missing artifact — `versions/` previously held only `.gitkeep`.
+- ✅ Postgres container `meetmind-db` runs via `nerdctl compose up -d`.
+- ✅ Frontend deps installed after the registry fix above.
+- ⚠️ Running the analysis pipeline needs real `LLM_API_KEY` / `BASE_URL` / `MODEL_NAME`
+  in `backend/.env`; the UI + DB + CRUD work without them.
+- Note: `init_db()` still runs `create_all` on boot. On a fresh DB, run `make migrate`
+  before first boot, or `create_all` pre-creates tables and `alembic upgrade` then fails.
